@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="languages_entries" translatable="false">
+        <item>Phone Default</item>
+        <item>English (en)</item>
+        <item>Pyccĸий (ru)</item>
+        <item>Українська (uk)</item>
+    </string-array>
+    <string-array name="languages_entryValues" translatable="false">
+        <item>default</item>
+        <item>en</item>
+        <item>ru</item>
+        <item>uk</item>
+    </string-array>
+</resources>

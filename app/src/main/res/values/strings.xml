@@ -1,0 +1,27 @@
+<resources>
+    <string name="app_name" translatable="false">Translator Online</string>
+    <string name="action_info" translatable="false">Info</string>
+    <string name="action_settings" translatable="false">Settings</string>
+    <string name="app_version" translatable="false">Version: ___;</string>
+    <string name="app_restart" translatable="false">Restarting app…</string>
+    <string name="vitaliyhtc_copyright" translatable="false">© VitaliyHTC</string>
+    <string name="app_version_description">App is currently under development. This is beta version.</string>
+
+
+
+    <string name="pref_app">Application Preferences</string>
+    <string name="pref_app_language">Change app language</string>
+    <string name="pref_app_language_sum">Select a language different than default</string>
+    <string name="pref_phone_default_lang">Phone default language</string>
+
+
+
+    <string name="button_translate">Translate</string>
+
+    <string name="detect_lang_other">It appears you have chosen the wrong language. Maybe correct choice are:</string>
+    <string name="no_internet_connection">Oops! Something went wrong. Please check your internet connection and application permissions to access internet.</string>
+    <string name="toast_detector_error">Error in language detector. No internet connection?</string>
+    <string name="toast_translator_error">Error in translator. No internet connection?</string>
+    <string name="toast_getlangs_error">Error upon receipt of the list supported languages list. No internet connection?</string>
+
+</resources>

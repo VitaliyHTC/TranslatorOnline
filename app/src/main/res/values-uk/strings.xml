@@ -1,0 +1,21 @@
+<resources>
+    <string name="app_version_description">Програма на стадії розробки. Це бета версія.</string>
+
+
+
+    <string name="pref_app">Параметри додатку</string>
+    <string name="pref_app_language">Змінити мову додатку</string>
+    <string name="pref_app_language_sum">Виберіть мову відмінну від системної</string>
+    <string name="pref_phone_default_lang">Системна мова пристрою</string>
+
+
+
+    <string name="button_translate">Перекласти</string>
+
+    <string name="detect_lang_other">Схоже ви невірно вибрали мову. Можливо правлильний вибір:</string>
+    <string name="no_internet_connection">От халепа! Щось пішло не так. Будь ласка, перевірте підключення до Інтернету і програма має дозвіл для доступу до Інтернету.</string>
+    <string name="toast_detector_error">Помилка в детекторі мови. Немає підключення до Інтернету?</string>
+    <string name="toast_translator_error">Помилка перекладача. Немає підключення до Інтернету?</string>
+    <string name="toast_getlangs_error">Помилка при отриманні списку підтримуваних мов. Немає підключення до Інтернету?</string>
+
+</resources>

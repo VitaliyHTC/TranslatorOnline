@@ -1,0 +1,21 @@
+<resources>
+    <string name="app_version_description">Програма на стадии разработки. Это бета версия.</string>
+
+
+
+    <string name="pref_app">Настройки приложения</string>
+    <string name="pref_app_language">Изменить язык приложения</string>
+    <string name="pref_app_language_sum">Выберите язык, отличный от предустановленного</string>
+    <string name="pref_phone_default_lang">Предустановленный язык устройства</string>
+
+
+
+    <string name="button_translate">Перевести</string>
+
+    <string name="detect_lang_other">Возможно вы ошиблись с выбором языка. Предположительно корректный выбор:</string>
+    <string name="no_internet_connection">Упс! Что-то пошло не так. Пожалуйста, проверьте подключение к Интернету и разрешения приложения для доступа к Интернету.</string>
+    <string name="toast_detector_error">Ошибка в детекторе языка. Нет соединения с интернетом?</string>
+    <string name="toast_translator_error">Ошибка переводчика. Нет соединения с интернетом?</string>
+    <string name="toast_getlangs_error">Ошибка при получении списка поддерживаемых языков. Нет соединения с интернетом?</string>
+
+</resources>

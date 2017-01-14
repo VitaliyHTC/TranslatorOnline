@@ -1,5 +1,6 @@
 package com.vitaliyhtc.translatoronline;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -11,6 +12,7 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
@@ -84,6 +86,10 @@ public class MainActivity  extends AppCompatActivity {
         View.OnClickListener onClickListenerSwap = new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+
+                //hideSoftKeyboard when leave EditText
+                hideSoftKeyboard(MainActivity.this);
+
                 int tmp = fromLangSpinner.getSelectedItemPosition();
                 fromLangSpinner.setSelection(toLangSpinner.getSelectedItemPosition());
                 toLangSpinner.setSelection(tmp);
@@ -96,6 +102,9 @@ public class MainActivity  extends AppCompatActivity {
         View.OnClickListener onClickListenerTranslate = new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+
+                //hideSoftKeyboard when leave EditText
+                hideSoftKeyboard(MainActivity.this);
 
                 Object fromSpinnerSelectedItem = fromLangSpinner.getSelectedItem();
                 Object toSpinnerSelectedItem = toLangSpinner.getSelectedItem();
@@ -365,6 +374,11 @@ public class MainActivity  extends AppCompatActivity {
             editor.putString("selectedToSpinnerCodeString", toString.substring(0, toString.indexOf(" ")));
             editor.commit();
         }
+    }
+
+    public static void hideSoftKeyboard(Activity activity) {
+        InputMethodManager inputMethodManager = (InputMethodManager) activity.getSystemService(Activity.INPUT_METHOD_SERVICE);
+        inputMethodManager.hideSoftInputFromWindow(activity.getCurrentFocus().getWindowToken(), 0);
     }
 
     @Override

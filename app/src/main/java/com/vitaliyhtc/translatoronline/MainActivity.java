@@ -35,9 +35,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Locale;
-import java.util.Map;
 
 /**
  * Created by VitaliyHTC on 12.01.2017.
@@ -53,8 +51,8 @@ public class MainActivity  extends AppCompatActivity {
     public static String sDefSystemLanguage=null;
     private String language;
 
-    private static Map<String, String> langsMap = new HashMap<>();
-    private static List<String> langsList = new ArrayList<>();
+    private static HashMap<String, String> langsMap = new HashMap<>();
+    private static ArrayList<String> langsList = new ArrayList<>();
     private Spinner fromLangSpinner;
     private Spinner toLangSpinner;
     private Button swapButton;
@@ -74,7 +72,11 @@ public class MainActivity  extends AppCompatActivity {
         getSupportActionBar().setDisplayShowHomeEnabled(true);
         getSupportActionBar().setIcon(R.mipmap.translate_launcher);
 
-        setSpinners();// fill spinners with languages list
+        final Bundle savedInstanceStateFinal = savedInstanceState;
+        // fill spinners with languages list
+        if(!restoreLangsSpinners(savedInstanceState)){
+            setLangsSpinnersFromServer();
+        }
 
         fromLangSpinner = (Spinner) findViewById(R.id.fromSpinner);
         toLangSpinner = (Spinner) findViewById(R.id.toSpinner);
@@ -217,7 +219,10 @@ public class MainActivity  extends AppCompatActivity {
             }//if( fromSpinnerSelectedItem!=null && toSpinnerSelectedItem!=null ){
                 else{
                     toEditText.setText(getResources().getString(R.string.no_internet_connection));
-                    setSpinners();
+                    // fill spinners with languages list
+                    if(!restoreLangsSpinners(savedInstanceStateFinal)){
+                        setLangsSpinnersFromServer();
+                    }
                 }
             }//public void onClick(View view)
         };
@@ -244,6 +249,31 @@ public class MainActivity  extends AppCompatActivity {
 
 
 
+
+    private boolean restoreLangsSpinners(Bundle savedInstanceState){
+        if(savedInstanceState == null) {
+            return false;
+        } else {
+            langsList = (ArrayList<String>) savedInstanceState.getSerializable("langsList");
+            if(langsList == null || langsList.isEmpty()) {
+                return false;
+            } else {
+                ArrayAdapter<String> spinnerArrayAdapter = new ArrayAdapter<String>(context, android.R.layout.simple_spinner_item, langsList);
+
+                Spinner fromLangSpinner = (Spinner) findViewById(R.id.fromSpinner);
+                Spinner toLangSpinner = (Spinner) findViewById(R.id.toSpinner);
+
+                fromLangSpinner.setAdapter(spinnerArrayAdapter);
+                toLangSpinner.setAdapter(spinnerArrayAdapter);
+
+                fromLangSpinner.setSelection(savedInstanceState.getInt("selectedFromSpinnerItemPosition"));
+                toLangSpinner.setSelection(savedInstanceState.getInt("selectedToSpinnerItemPosition"));
+
+                return true;
+            }
+        }
+    }
+
     /*
     Ок. Тут заповнюємо список для Spinners, вибираємо мови.
     Зберігаємо вибрані при завершенні та відновлюємо при повторному запуску.
@@ -257,7 +287,7 @@ public class MainActivity  extends AppCompatActivity {
     Треба сортований список для spinner-а і номер позиції для дефолтної мови.
     Тут ніби все готово.
      */
-    private void setSpinners(){
+    private void setLangsSpinnersFromServer(){
         String requestUrlGetLangs = "https://translate.yandex.net/api/v1.5/tr.json/getLangs?ui="+language+"&key="+apiKey;
         ///api/v1.5/tr.json/getLangs?ui=en&key=API-KEY
 
@@ -271,7 +301,6 @@ public class MainActivity  extends AppCompatActivity {
 
                         JSONObject langsJSONObject = response.optJSONObject("langs");
 
-                        //List<String> langsList = new ArrayList<>();
                         int enLangPosition = 0;
                         int ukLangPosition = 0;
                         String enLangString = "";
@@ -389,6 +418,15 @@ public class MainActivity  extends AppCompatActivity {
         if (requestQueue != null) {
             requestQueue.cancelAll(TAG);
         }
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putSerializable("langsList", langsList);
+        outState.putInt("selectedFromSpinnerItemPosition", ((Spinner) findViewById(R.id.fromSpinner)).getSelectedItemPosition());
+        outState.putInt("selectedToSpinnerItemPosition", ((Spinner) findViewById(R.id.toSpinner)).getSelectedItemPosition());
+        //outState.putSerializable("langsMap", langsMap);
     }
 
 }

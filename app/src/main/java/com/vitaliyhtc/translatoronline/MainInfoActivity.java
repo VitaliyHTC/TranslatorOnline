@@ -9,10 +9,6 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.MenuItem;
 import android.widget.TextView;
 
-/**
- * Created by VitaliyHTC on 12.01.2017.
- */
-
 public class MainInfoActivity extends AppCompatActivity {
 
     @Override

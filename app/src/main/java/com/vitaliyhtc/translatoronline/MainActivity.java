@@ -37,10 +37,6 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Locale;
 
-/**
- * Created by VitaliyHTC on 12.01.2017.
- */
-
 public class MainActivity  extends AppCompatActivity {
 
     private static final String apiKey = "trnsl.1.1.20170112T135601Z.bee22c8cd84fa8da.3f971312dbca8748790dd308c7bfab07019c915a";
@@ -73,7 +69,7 @@ public class MainActivity  extends AppCompatActivity {
         getSupportActionBar().setIcon(R.mipmap.translate_launcher);
 
         final Bundle savedInstanceStateFinal = savedInstanceState;
-        // fill spinners with languages list
+
         if(!restoreLangsSpinners(savedInstanceState)){
             setLangsSpinnersFromServer();
         }
@@ -89,7 +85,6 @@ public class MainActivity  extends AppCompatActivity {
             @Override
             public void onClick(View view) {
 
-                //hideSoftKeyboard when leave EditText
                 hideSoftKeyboard(MainActivity.this);
 
                 int tmp = fromLangSpinner.getSelectedItemPosition();
@@ -105,7 +100,6 @@ public class MainActivity  extends AppCompatActivity {
             @Override
             public void onClick(View view) {
 
-                //hideSoftKeyboard when leave EditText
                 hideSoftKeyboard(MainActivity.this);
 
                 Object fromSpinnerSelectedItem = fromLangSpinner.getSelectedItem();
@@ -114,21 +108,21 @@ public class MainActivity  extends AppCompatActivity {
                 /* Verify that spinners is filled and has selected items */
                 if( fromSpinnerSelectedItem!=null && toSpinnerSelectedItem!=null ){
 
-                String fromString = fromLangSpinner.getSelectedItem().toString();
-                String toString = toLangSpinner.getSelectedItem().toString();
-                final String fromLangCode = fromString.substring(0, fromString.indexOf(" "));
-                String toLangCode = toString.substring(0, toString.indexOf(" "));
-                String fromEditTextString = fromEditText.getText().toString();
+                    String fromString = fromLangSpinner.getSelectedItem().toString();
+                    String toString = toLangSpinner.getSelectedItem().toString();
+                    final String fromLangCode = fromString.substring(0, fromString.indexOf(" "));
+                    String toLangCode = toString.substring(0, toString.indexOf(" "));
+                    String fromEditTextString = fromEditText.getText().toString();
 
-                String textURLEncoded = "";
-                // https://docs.oracle.com/javase/7/docs/api/java/net/URLEncoder.html
-                try {
-                    textURLEncoded = URLEncoder.encode(fromEditTextString, "UTF-8");
-                } catch (UnsupportedEncodingException e) {
-                    e.printStackTrace();
-                }
+                    String textURLEncoded = "";
+                    // https://docs.oracle.com/javase/7/docs/api/java/net/URLEncoder.html
+                    try {
+                        textURLEncoded = URLEncoder.encode(fromEditTextString, "UTF-8");
+                    } catch (UnsupportedEncodingException e) {
+                        e.printStackTrace();
+                    }
 
-                translateButton.setEnabled(false);
+                    translateButton.setEnabled(false);
 
 
 
@@ -160,7 +154,6 @@ public class MainActivity  extends AppCompatActivity {
                                 }, new Response.ErrorListener() {
                                     @Override
                                     public void onErrorResponse(VolleyError error) {
-                                        //Auto-generated method stub
                                         Toast.makeText(getApplicationContext(), getResources().getString(R.string.toast_detector_error), Toast.LENGTH_LONG).show();
                                         translateButton.setEnabled(true);
                                         error.printStackTrace();
@@ -173,14 +166,14 @@ public class MainActivity  extends AppCompatActivity {
 
 
 
-                /* Volley translation here! */
-                String requestUrlTranslate = "https://translate.yandex.net/api/v1.5/tr.json/translate?key=" + apiKey +
+                    /* Volley translation here! */
+                    String requestUrlTranslate = "https://translate.yandex.net/api/v1.5/tr.json/translate?key=" + apiKey +
                         "&text=" + textURLEncoded + "&lang=" + toLangCode;
                     //"&text=" + textURLEncoded + "&lang=" + fromLangCode + "-" + toLangCode;
                     // Source language autodetect if only target lang code sended to API
 
                     toEditText.setText("");
-                JsonObjectRequest jsObjRequestTranslate = new JsonObjectRequest
+                    JsonObjectRequest jsObjRequestTranslate = new JsonObjectRequest
                         (Request.Method.GET, requestUrlTranslate, null, new Response.Listener<JSONObject>() {
                             @Override
                             public void onResponse(JSONObject response) {
@@ -205,19 +198,17 @@ public class MainActivity  extends AppCompatActivity {
                         }, new Response.ErrorListener() {
                             @Override
                             public void onErrorResponse(VolleyError error) {
-                                //Auto-generated method stub
                                 Toast.makeText(getApplicationContext(), getResources().getString(R.string.toast_translator_error), Toast.LENGTH_LONG).show();
                                 translateButton.setEnabled(true);
                                 error.printStackTrace();
                             }
                         });
-                jsObjRequestTranslate.setTag(TAG);
-                // Access the RequestQueue through your singleton class.
-                MyVolleySingleton.getInstance(context).addToRequestQueue(jsObjRequestTranslate);
-                /* Volley translation here! end */
+                    jsObjRequestTranslate.setTag(TAG);
 
-            }//if( fromSpinnerSelectedItem!=null && toSpinnerSelectedItem!=null ){
-                else{
+                    MyVolleySingleton.getInstance(context).addToRequestQueue(jsObjRequestTranslate);
+                    /* Volley translation here! end */
+
+                } else {
                     toEditText.setText(getResources().getString(R.string.no_internet_connection));
                     // fill spinners with languages list
                     if(!restoreLangsSpinners(savedInstanceStateFinal)){
@@ -227,8 +218,6 @@ public class MainActivity  extends AppCompatActivity {
             }//public void onClick(View view)
         };
         translateButton.setOnClickListener(onClickListenerTranslate);
-        /* Translate button onclick listener end */
-
     }
 
     private void setLanguage() {
@@ -274,19 +263,6 @@ public class MainActivity  extends AppCompatActivity {
         }
     }
 
-    /*
-    Ок. Тут заповнюємо список для Spinners, вибираємо мови.
-    Зберігаємо вибрані при завершенні та відновлюємо при повторному запуску.
-    Зроблено перевірку, якщо при відновленні не співпадає позиція і рядок мови то значить змінено
-    список мов до використання у Yandex Translate API. Відповідно скидуємо вибір до default значень.
-    При зміні мови додатку вибір скидається до default. (String збережений і нового поля не співпадає).
-    Варіант оптимізації: парсити і порівнювати коди на початку. *10 mins later* Готово!
-    Чому в spinner порядок неправильний? Ітератор йде непослідовно?
-    https://developer.android.com/reference/org/json/JSONObject.html#keys()
-    >>> The order of the keys is undefined.
-    Треба сортований список для spinner-а і номер позиції для дефолтної мови.
-    Тут ніби все готово.
-     */
     private void setLangsSpinnersFromServer(){
         String requestUrlGetLangs = "https://translate.yandex.net/api/v1.5/tr.json/getLangs?ui="+language+"&key="+apiKey;
         ///api/v1.5/tr.json/getLangs?ui=en&key=API-KEY
@@ -356,13 +332,12 @@ public class MainActivity  extends AppCompatActivity {
                 }, new Response.ErrorListener() {
                     @Override
                     public void onErrorResponse(VolleyError error) {
-                        // Auto-generated method stub
                         Toast.makeText(getApplicationContext(), getResources().getString(R.string.toast_getlangs_error), Toast.LENGTH_LONG).show();
                         error.printStackTrace();
                     }
                 });
         jsObjRequestGetLangs.setTag(TAG);
-        // Access the RequestQueue through your singleton class.
+
         MyVolleySingleton.getInstance(context).addToRequestQueue(jsObjRequestGetLangs);
     }
 
@@ -426,7 +401,6 @@ public class MainActivity  extends AppCompatActivity {
         outState.putSerializable("langsList", langsList);
         outState.putInt("selectedFromSpinnerItemPosition", ((Spinner) findViewById(R.id.fromSpinner)).getSelectedItemPosition());
         outState.putInt("selectedToSpinnerItemPosition", ((Spinner) findViewById(R.id.toSpinner)).getSelectedItemPosition());
-        //outState.putSerializable("langsMap", langsMap);
     }
 
 }

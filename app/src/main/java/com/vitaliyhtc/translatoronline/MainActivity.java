@@ -39,12 +39,12 @@ import java.util.Locale;
 
 public class MainActivity  extends AppCompatActivity {
 
-    private static final String apiKey = "trnsl.1.1.20170112T135601Z.bee22c8cd84fa8da.3f971312dbca8748790dd308c7bfab07019c915a";
+    private static final String API_KEY = "trnsl.1.1.20170112T135601Z.bee22c8cd84fa8da.3f971312dbca8748790dd308c7bfab07019c915a";
+    private static final String VALLEY_TAG = "ValleyTag";
 
     private final Context context = this;
-    public static final String TAG = "ValleyTag";
 
-    public static String sDefSystemLanguage=null;
+    public static String sDefSystemLanguage=null; // Also used in SettingsActivity
     private String language;
 
     private static HashMap<String, String> langsMap = new HashMap<>();
@@ -68,8 +68,9 @@ public class MainActivity  extends AppCompatActivity {
         getSupportActionBar().setDisplayShowHomeEnabled(true);
         getSupportActionBar().setIcon(R.mipmap.translate_launcher);
 
-        final Bundle savedInstanceStateFinal = savedInstanceState;
 
+
+        final Bundle savedInstanceStateFinal = savedInstanceState;
         if(!restoreLangsSpinners(savedInstanceState)){
             setLangsSpinnersFromServer();
         }
@@ -93,6 +94,7 @@ public class MainActivity  extends AppCompatActivity {
             }
         };
         swapButton.setOnClickListener(onClickListenerSwap);
+
 
 
         /* Translate button onclick listener */
@@ -129,7 +131,7 @@ public class MainActivity  extends AppCompatActivity {
                     /* Volley language verification. */
                     if(!textURLEncoded.isEmpty()){
                         //https://translate.yandex.net/api/v1.5/tr.json/detect?key=trnsl.1.1.___&hint=en,de&text=___
-                        String requestURLDetect = "https://translate.yandex.net/api/v1.5/tr.json/detect?key=" + apiKey +
+                        String requestURLDetect = "https://translate.yandex.net/api/v1.5/tr.json/detect?key=" + API_KEY +
                                 "&hint=" + fromLangCode + "," + toLangCode + "&text=" + textURLEncoded;
 
                         JsonObjectRequest jsObjRequestDetect = new JsonObjectRequest
@@ -159,15 +161,15 @@ public class MainActivity  extends AppCompatActivity {
                                         error.printStackTrace();
                                     }
                                 });
-                        jsObjRequestDetect.setTag(TAG);
-                        MyVolleySingleton.getInstance(context).addToRequestQueue(jsObjRequestDetect);
+                        jsObjRequestDetect.setTag(VALLEY_TAG);
+                        VolleySingleton.getInstance(context).addToRequestQueue(jsObjRequestDetect);
                     }
                     /* Volley language verification. end */
 
 
 
                     /* Volley translation here! */
-                    String requestUrlTranslate = "https://translate.yandex.net/api/v1.5/tr.json/translate?key=" + apiKey +
+                    String requestUrlTranslate = "https://translate.yandex.net/api/v1.5/tr.json/translate?key=" + API_KEY +
                         "&text=" + textURLEncoded + "&lang=" + toLangCode;
                     //"&text=" + textURLEncoded + "&lang=" + fromLangCode + "-" + toLangCode;
                     // Source language autodetect if only target lang code sended to API
@@ -203,9 +205,9 @@ public class MainActivity  extends AppCompatActivity {
                                 error.printStackTrace();
                             }
                         });
-                    jsObjRequestTranslate.setTag(TAG);
+                    jsObjRequestTranslate.setTag(VALLEY_TAG);
 
-                    MyVolleySingleton.getInstance(context).addToRequestQueue(jsObjRequestTranslate);
+                    VolleySingleton.getInstance(context).addToRequestQueue(jsObjRequestTranslate);
                     /* Volley translation here! end */
 
                 } else {
@@ -220,52 +222,35 @@ public class MainActivity  extends AppCompatActivity {
         translateButton.setOnClickListener(onClickListenerTranslate);
     }
 
-    private void setLanguage() {
-        language = PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).getString("Language", "default");
-        if (language.equals("default")) {
-            if(sDefSystemLanguage!=null){
-                language = sDefSystemLanguage;
-            }else{
-                language = Locale.getDefault().getLanguage();
-            }
-        }
-        Locale locale = new Locale(language);
-        Locale.setDefault(locale);
-        Configuration configuration = new Configuration();
-        configuration.locale = locale;
-        getBaseContext().getResources().updateConfiguration(configuration, null);
-    }
 
 
 
 
     private boolean restoreLangsSpinners(Bundle savedInstanceState){
-        if(savedInstanceState == null) {
-            return false;
-        } else {
-            langsList = (ArrayList<String>) savedInstanceState.getSerializable("langsList");
-            if(langsList == null || langsList.isEmpty()) {
-                return false;
-            } else {
-                ArrayAdapter<String> spinnerArrayAdapter = new ArrayAdapter<String>(context, android.R.layout.simple_spinner_item, langsList);
+        if(savedInstanceState == null) { return false; }
 
-                Spinner fromLangSpinner = (Spinner) findViewById(R.id.fromSpinner);
-                Spinner toLangSpinner = (Spinner) findViewById(R.id.toSpinner);
+        langsList = (ArrayList<String>) savedInstanceState.getSerializable("langsList");
+        if(langsList == null || langsList.isEmpty()) { return false; }
 
-                fromLangSpinner.setAdapter(spinnerArrayAdapter);
-                toLangSpinner.setAdapter(spinnerArrayAdapter);
 
-                fromLangSpinner.setSelection(savedInstanceState.getInt("selectedFromSpinnerItemPosition"));
-                toLangSpinner.setSelection(savedInstanceState.getInt("selectedToSpinnerItemPosition"));
 
-                return true;
-            }
-        }
+        ArrayAdapter<String> spinnerArrayAdapter = new ArrayAdapter<String>(context, android.R.layout.simple_spinner_item, langsList);
+
+        Spinner fromLangSpinner = (Spinner) findViewById(R.id.fromSpinner);
+        Spinner toLangSpinner = (Spinner) findViewById(R.id.toSpinner);
+
+        fromLangSpinner.setAdapter(spinnerArrayAdapter);
+        toLangSpinner.setAdapter(spinnerArrayAdapter);
+
+        fromLangSpinner.setSelection(savedInstanceState.getInt("selectedFromSpinnerItemPosition"));
+        toLangSpinner.setSelection(savedInstanceState.getInt("selectedToSpinnerItemPosition"));
+
+        return true;
     }
 
     private void setLangsSpinnersFromServer(){
-        String requestUrlGetLangs = "https://translate.yandex.net/api/v1.5/tr.json/getLangs?ui="+language+"&key="+apiKey;
-        ///api/v1.5/tr.json/getLangs?ui=en&key=API-KEY
+        String requestUrlGetLangs = "https://translate.yandex.net/api/v1.5/tr.json/getLangs?ui="+language+"&key="+ API_KEY;
+        // /api/v1.5/tr.json/getLangs?ui=en&key=API-KEY
 
         JsonObjectRequest jsObjRequestGetLangs = new JsonObjectRequest
                 (Request.Method.GET, requestUrlGetLangs, null, new Response.Listener<JSONObject>() {
@@ -336,10 +321,55 @@ public class MainActivity  extends AppCompatActivity {
                         error.printStackTrace();
                     }
                 });
-        jsObjRequestGetLangs.setTag(TAG);
+        jsObjRequestGetLangs.setTag(VALLEY_TAG);
 
-        MyVolleySingleton.getInstance(context).addToRequestQueue(jsObjRequestGetLangs);
+        VolleySingleton.getInstance(context).addToRequestQueue(jsObjRequestGetLangs);
     }
+
+
+
+
+
+
+
+    private static void hideSoftKeyboard(Activity activity) {
+        InputMethodManager inputMethodManager = (InputMethodManager) activity.getSystemService(Activity.INPUT_METHOD_SERVICE);
+        inputMethodManager.hideSoftInputFromWindow(activity.getCurrentFocus().getWindowToken(), 0);
+    }
+
+    private void setLanguage() {
+        language = PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).getString("Language", "default");
+        if (language.equals("default")) {
+            if(sDefSystemLanguage!=null){
+                language = sDefSystemLanguage;
+            }else{
+                language = Locale.getDefault().getLanguage();
+            }
+        }
+        Locale locale = new Locale(language);
+        Locale.setDefault(locale);
+        Configuration configuration = new Configuration();
+        configuration.locale = locale;
+        getBaseContext().getResources().updateConfiguration(configuration, null);
+    }
+
+    private void writeSharedPreferences() {
+        Object fromSpinnerSelectedItem = ((Spinner) findViewById(R.id.fromSpinner)).getSelectedItem();
+        Object toSpinnerSelectedItem = ((Spinner) findViewById(R.id.toSpinner)).getSelectedItem();
+        if( fromSpinnerSelectedItem!=null && toSpinnerSelectedItem!=null ){
+            SharedPreferences.Editor editor = this.getSharedPreferences("TranslatorOnline_Setting", 0).edit();
+            editor.putInt("selectedFromSpinnerItemPosition", ((Spinner) findViewById(R.id.fromSpinner)).getSelectedItemPosition());
+            editor.putInt("selectedToSpinnerItemPosition", ((Spinner) findViewById(R.id.toSpinner)).getSelectedItemPosition());
+
+            String fromString = fromSpinnerSelectedItem.toString();
+            String toString = toSpinnerSelectedItem.toString();
+            editor.putString("selectedFromSpinnerCodeString", fromString.substring(0, fromString.indexOf(" ")));
+            editor.putString("selectedToSpinnerCodeString", toString.substring(0, toString.indexOf(" ")));
+            editor.commit();
+        }
+    }
+
+
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -364,43 +394,22 @@ public class MainActivity  extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    public void writeSharedPreferences() {
-        Object fromSpinnerSelectedItem = ((Spinner) findViewById(R.id.fromSpinner)).getSelectedItem();
-        Object toSpinnerSelectedItem = ((Spinner) findViewById(R.id.toSpinner)).getSelectedItem();
-        if( fromSpinnerSelectedItem!=null && toSpinnerSelectedItem!=null ){
-            SharedPreferences.Editor editor = this.getSharedPreferences("TranslatorOnline_Setting", 0).edit();
-            editor.putInt("selectedFromSpinnerItemPosition", ((Spinner) findViewById(R.id.fromSpinner)).getSelectedItemPosition());
-            editor.putInt("selectedToSpinnerItemPosition", ((Spinner) findViewById(R.id.toSpinner)).getSelectedItemPosition());
-
-            String fromString = fromSpinnerSelectedItem.toString();
-            String toString = toSpinnerSelectedItem.toString();
-            editor.putString("selectedFromSpinnerCodeString", fromString.substring(0, fromString.indexOf(" ")));
-            editor.putString("selectedToSpinnerCodeString", toString.substring(0, toString.indexOf(" ")));
-            editor.commit();
-        }
-    }
-
-    public static void hideSoftKeyboard(Activity activity) {
-        InputMethodManager inputMethodManager = (InputMethodManager) activity.getSystemService(Activity.INPUT_METHOD_SERVICE);
-        inputMethodManager.hideSoftInputFromWindow(activity.getCurrentFocus().getWindowToken(), 0);
-    }
-
-    @Override
-    protected void onStop() {
-        super.onStop();
-        this.writeSharedPreferences();
-        RequestQueue requestQueue = MyVolleySingleton.getInstance(context).getRequestQueue();
-        if (requestQueue != null) {
-            requestQueue.cancelAll(TAG);
-        }
-    }
-
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
         outState.putSerializable("langsList", langsList);
         outState.putInt("selectedFromSpinnerItemPosition", ((Spinner) findViewById(R.id.fromSpinner)).getSelectedItemPosition());
         outState.putInt("selectedToSpinnerItemPosition", ((Spinner) findViewById(R.id.toSpinner)).getSelectedItemPosition());
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        this.writeSharedPreferences();
+        RequestQueue requestQueue = VolleySingleton.getInstance(context).getRequestQueue();
+        if (requestQueue != null) {
+            requestQueue.cancelAll(VALLEY_TAG);
+        }
     }
 
 }

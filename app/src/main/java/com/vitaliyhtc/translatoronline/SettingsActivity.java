@@ -65,11 +65,4 @@ public class SettingsActivity  extends SettingsActivityAdapter {
         return super.onOptionsItemSelected(item);
     }
 
-    protected void onStart() {
-        super.onStart();
-    }
-    protected void onStop() {
-        super.onStop();
-    }
-
 }
